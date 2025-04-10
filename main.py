@@ -21,4 +21,15 @@ firebase_db = firestore.Client()
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("main-page.html", {"request": request})
+
+@app.get("/login", response_class=HTMLResponse)
+async def fetch_login(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@app.get("/boards", response_class=HTMLResponse)
+async def fetch_login(request: Request):
+    return templates.TemplateResponse("board.html", {"request": request})
+
+

@@ -4,11 +4,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Task Flow</title>
+
+
+
+    <style>
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-container {
+            background-color: #fff;
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .login-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .login-header h4 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .login-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+            transition: color 0.2s ease;
+        }
+
+        .login-close:hover {
+            color: #000;
+        }
+
+        .login-form-group {
+            margin-bottom: 15px;
+        }
+
+        .login-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .login-form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        .login-form-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+        }
+
+        .login-footer {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .login-btn,
+        .signup-btn {
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+
+        .login-btn {
+            background-color: #581c87;
+            color: white;
+        }
+
+        .login-btn:hover {
+            background-color: #581c87;
+        }
+
+        .signup-btn {
+            background-color: transparent;
+            border: 2px solid #581c87;
+            color: #581c87;
+        }
+
+        .signup-btn:hover {
+            background-color: #581c87;
+            color: white;
+        }
+
+        .signout-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .signout-btn:hover {
+            background-color: #c82333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+
+
 </head>
+<script src="https://cdn.tailwindcss.com"></script>
 
 <body>
-    Snfien
+
+    <div class="login-modal" id="loginModal">
+        <div class="login-container" id="login-box">
+            <div class="login-header">
+                <h4>Account Login</h4>
+                <span class="login-close" onclick="closeLoginModal()">&times;</span>
+            </div>
+            <div class="login-body">
+                <div class="login-form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" placeholder="Enter your email">
+                </div>
+                <div class="login-form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+            </div>
+            <div class="login-footer">
+                <button type="button" class="login-btn" id="login">Login</button>
+                <button type="button" class="signup-btn" id="sign-up">Sign Up</button>
+            </div>
+        </div>
+        <button id="sign-out" class="signout-btn" hidden>Sign out</button>
+    </div>
+
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-gray-900">TaskMaster</span>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="#"
+                            class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Home
+                        </a>
+                        <a href="/boards" id="viewBoard"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium hidden">
+                            Boards
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <!-- Login button (shown when user is not logged in) -->
+                    <div id="loginButton">
+                        <button type="button" onclick="openLoginModal()"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Login
+                        </button>
+                    </div>
+
+                    <!-- User info (shown when user is logged in) -->
+                    <div id="userInfo" class="hidden flex items-center">
+                        <span id="userName" class="text-sm font-medium text-gray-700 mr-4"></span>
+                        <button type="button" onclick="document.getElementById('sign-out').click()"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </nav>
+
+
+    <div class="">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script type="module" src="{{ url_for('static', path='/firebase-login.js') }}"></script>
+
+    <script>
+        var userEmail
+        function openLoginModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('loginModal');
+            if (event.target === modal) {
+                closeLoginModal();
+            }
+        }
+        // Parses the JWT from a given token string
+        function decodeJWT(token) {
+            try {
+                const payload = token.split('.')[1];
+                return JSON.parse(atob(payload));
+            } catch (error) {
+                return {};
+            }
+        }
+
+        // Extracts the auth token from cookies
+        function getAuthTokenFromCookies(cookieString) {
+            return cookieString
+                .split(';')
+                .map(entry => entry.trim().split('='))
+                .find(([key]) => key === 'token')?.[1] || "";
+        }
+
+        // Updates the UI based on whether a user is authenticated
+        function updateUIBasedOnAuth() {
+            const token = getAuthTokenFromCookies(document.cookie);
+
+            console.log("token is ", token)
+
+
+            if (token) {
+                userEmail = decodeJWT(token).email || "User";
+                console.log("inside token ", userEmail)
+                document.getElementById('loginButton').classList.add('hidden')
+                document.getElementById('userInfo').classList.remove('hidden')
+                document.getElementById('viewBoard').classList.remove('hidden')
+                document.getElementById('userName').innerHTML = `<p>${userEmail}</p>`
+                // toggleElements(true);
+            } else {
+
+                document.getElementById('userInfo').classList.add('hidden')
+                document.getElementById('viewBoard').classList.add('hidden')
+                document.getElementById('loginButton').classList.remove('hidden')
+                toggleElements(false);
+            }
+        }
+
+        // Sends a request to create a new user based on cookie token
+        function initializeUserSession() {
+            console.log("inside user session")
+            const token = getAuthTokenFromCookies(document.cookie);
+            if (!token) return;
+
+            const userEmail = decodeJWT(token).email || "User";
+
+            console.log("User detected:", userEmail);
+
+            fetch(`/createnewuser`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: userEmail })
+            });
+        }
+
+        // Run authentication check after DOM loads and every 2 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            updateUIBasedOnAuth();
+            setInterval(updateUIBasedOnAuth, 2000);
+        });
+        initializeUserSession();
+
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const mobileToggle = document.getElementById('mobile-toggle');
+            const collapseToggle = document.getElementById('collapse-toggle');
+            const overlay = document.getElementById('overlay');
+            const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+
+            mobileToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            });
+
+            overlay.addEventListener('click', function () {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+            });
+
+            collapseToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+
+                if (sidebar.classList.contains('collapsed')) {
+                    mainContent.classList.remove('md:ml-64');
+                    mainContent.classList.add('md:ml-20');
+
+                    collapseToggle.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+        </svg>
+      `;
+                } else {
+                    mainContent.classList.remove('md:ml-20');
+                    mainContent.classList.add('md:ml-64');
+
+                    collapseToggle.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+        </svg>
+      `;
+                }
+            });
+
+            dropdownToggles.forEach(toggle => {
+                toggle.addEventListener('click', function () {
+                    const submenu = this.nextElementSibling;
+                    const chevron = this.querySelector('.chevron-icon');
+
+                    submenu.classList.toggle('open');
+                    chevron.classList.toggle('open');
+
+                    dropdownToggles.forEach(otherToggle => {
+                        if (otherToggle !== toggle) {
+                            const otherSubmenu = otherToggle.nextElementSibling;
+                            const otherChevron = otherToggle.querySelector('.chevron-icon');
+
+                            otherSubmenu.classList.remove('open');
+                            otherChevron.classList.remove('open');
+                        }
+                    });
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>
