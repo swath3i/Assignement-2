@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster - Task Boards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-gray-900">TaskMaster</span>
+                    </div>
+                    <div class="hidden md:ml-6 md:flex md:space-x-8">
+                        <a href="/"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Home
+                        </a>
+                        <a href="taskboards.html"
+                            class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Task Boards
+                        </a>
+                        <a href="#"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Reports
+                        </a>
+                        <a href="#"
+                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Settings
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <!-- User info -->
+                    <div id="userInfo" class="flex items-center">
+                        <span id="userName" class="text-sm font-medium text-gray-700 mr-4"></span>
+                        <button type="button" onclick="logout()"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">Task Boards</h1>
+            <button onclick="openCreateBoardModal()"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-plus mr-2"></i> New Board
+            </button>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="mb-6 bg-white p-4 rounded-lg shadow">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div class="relative w-full md:w-64 mb-4 md:mb-0">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input id="searchInput" type="text"
+                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        placeholder="Search task boards" onkeyup="filterBoards()">
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterByStatus('all')"
+                        class="filter-btn active px-3 py-2 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        data-filter="all">
+                        All
+                    </button>
+                    <button onclick="filterByStatus('active')"
+                        class="filter-btn px-3 py-2 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        data-filter="active">
+                        Active
+                    </button>
+                    <button onclick="filterByStatus('completed')"
+                        class="filter-btn px-3 py-2 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        data-filter="completed">
+                        Completed
+                    </button>
+                    <button onclick="filterByStatus('created')"
+                        class="filter-btn px-3 py-2 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        data-filter="created">
+                        Created by you
+                    </button>
+                    <button onclick="filterByStatus('assigned')"
+                        class="filter-btn px-3 py-2 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+                        data-filter="assigned">
+                        Assigned to you
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Boards Grid -->
+        <div id="taskBoardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Task boards will be dynamically inserted here -->
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="hidden text-center py-10">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No task boards found</h3>
+            <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filter to find what you're looking for.
+            </p>
+        </div>
+    </div>
+
+    <!-- View Task Board Modal -->
+    <div id="viewBoardModal"
+        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div
+            class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-4xl sm:w-full max-h-[90vh] flex flex-col">
+            <div class="bg-indigo-600 px-4 py-3 sm:px-6 flex justify-between items-center">
+                <h3 class="text-lg leading-6 font-medium text-white" id="viewBoardTitle">
+                    Task Board Details
+                </h3>
+                <button type="button" onclick="closeViewBoardModal()" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="overflow-y-auto p-6 flex-grow">
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h4 class="text-lg font-medium text-gray-900">Tasks</h4>
+                        <button onclick="openAddTaskModal()"
+                            class="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-plus mr-1"></i> Add Task
+                        </button>
+                    </div>
+                    <div id="viewBoardTasks" class="space-y-4">
+                        <!-- Tasks will be dynamically inserted here -->
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-medium text-gray-900 mb-4">Collaborators</h4>
+                    <div id="viewBoardCollaborators" class="flex flex-wrap gap-2">
+                        <!-- Collaborators will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="closeViewBoardModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create/Edit Board Modal -->
+    <div id="boardModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="boardModalTitle">
+                            Create New Task Board
+                        </h3>
+                        <div class="mt-6">
+                            <form id="boardForm" class="space-y-6">
+                                <input type="hidden" id="boardId" value="">
+                                <div>
+                                    <label for="boardName" class="block text-sm font-medium text-gray-700">
+                                        Board Name
+                                    </label>
+                                    <div class="mt-1">
+                                        <input id="boardName" name="boardName" type="text" required
+                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="collaborators" class="block text-sm font-medium text-gray-700">
+                                        Collaborators (comma separated emails)
+                                    </label>
+                                    <div class="mt-1">
+                                        <input id="collaborators" name="collaborators" type="text"
+                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            placeholder="user1@example.com, user2@example.com">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="saveBoardModal()"
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Save
+                </button>
+                <button type="button" onclick="closeBoardModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Task Modal -->
+    <div id="taskModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="taskModalTitle">
+                            Add New Task
+                        </h3>
+                        <div class="mt-6">
+                            <form id="taskForm" class="space-y-6">
+                                <input type="hidden" id="taskIndex" value="-1">
+                                <div>
+                                    <label for="taskName" class="block text-sm font-medium text-gray-700">
+                                        Task Name
+                                    </label>
+                                    <div class="mt-1">
+                                        <input id="taskName" name="taskName" type="text" required
+                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="taskUsers" class="block text-sm font-medium text-gray-700">
+                                        Assigned Users (comma separated emails)
+                                    </label>
+                                    <div class="mt-1">
+                                        <input id="taskUsers" name="taskUsers" type="text"
+                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            placeholder="user1@example.com, user2@example.com">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="saveTaskModal()"
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Save
+                </button>
+                <button type="button" onclick="closeTaskModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal"
+        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div
+                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="confirmationTitle">
+                            Delete Confirmation
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500" id="confirmationMessage">
+                                Are you sure you want to delete this item? This action cannot be undone.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" id="confirmButton"
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Delete
+                </button>
+                <button type="button" onclick="closeConfirmationModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current user (simulated)
+        let currentUser = null;
+
+        // Current active board for task operations
+        let currentBoardIndex = -1;
+
+        // Sample data (in a real app, this would come from an API)
+        let taskBoards = [];
+
+
+        function decodeJWT(token) {
+            try {
+                const payload = token.split('.')[1];
+                return JSON.parse(atob(payload));
+            } catch (error) {
+                return {};
+            }
+        }
+
+        // Extracts the auth token from cookies
+        function getAuthTokenFromCookies(cookieString) {
+            return cookieString
+                .split(';')
+                .map(entry => entry.trim().split('='))
+                .find(([key]) => key === 'token')?.[1] || "";
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', async function () {
+            const token = getAuthTokenFromCookies(document.cookie);
+            if (!token) return;
+
+            const userEmail = decodeJWT(token).email || "User";
+            console.log("user email ", userEmail)
+            currentUser = userEmail
+            // const fetchTaskBoardResponse = await fetch(`/getusertaskbaord/swathi@gmail.com`, {
+            //     method: 'GET'
+            // })
+            // const boards = await fetchTaskBoardResponse.json()
+            // console.log("fetchTaskBoardResponse ", boards)
+            fetch(`/gettaskboards/${currentUser}`, { method: 'GET' })
+                .then(response => response.json())
+                .then(taskboards => {
+                    renderTaskBoards(taskboards.user_tasks);
+                })
+                .catch(error => {
+                    console.error("Error fetching taskboards:", error);
+                });
+
+        });
+
+        // Load sample data
+        function loadSampleData() {
+
+            taskBoards = [
+                {
+                    boardId: "board1",
+                    name: "Project Alpha",
+                    admin: "user@gmail.com",
+                    tasks: [
+                        {
+                            name: "Design mockups",
+                            users: ["user@gmail.com", "designer@example.com"],
+                            status: "completed",
+                            pendingDate: "2023-05-10",
+                            finishedDate: "2023-05-15"
+                        },
+                        {
+                            name: "Frontend implementation",
+                            users: ["user@gmail.com"],
+                            status: "active",
+                            pendingDate: "2023-05-16",
+                            finishedDate: ""
+                        }
+                    ],
+                    collaborators: ["user@gmail.com", "designer@example.com", "developer@example.com"]
+                },
+                {
+                    boardId: "board2",
+                    name: "Marketing Campaign",
+                    admin: "marketing@example.com",
+                    tasks: [
+                        {
+                            name: "Social media strategy",
+                            users: ["user@gmail.com", "marketing@example.com"],
+                            status: "active",
+                            pendingDate: "2023-05-20",
+                            finishedDate: ""
+                        }
+                    ],
+                    collaborators: ["user@gmail.com", "marketing@example.com"]
+                }
+            ];
+
+
+            saveTaskBoards();
+        }
+
+        // Save task boards to localStorage
+        function saveTaskBoards() {
+            localStorage.setItem('taskBoards', JSON.stringify(taskBoards));
+        }
+
+        // Render all task boards
+        function renderTaskBoards(taskboards) {
+            console.log("inside render tasks ", taskboards)
+            const container = document.getElementById('taskBoardsContainer');
+            container.innerHTML = '';
+
+            let visibleBoards = 0;
+            // const taskBoards = [
+            //     {
+            //         boardId: "board1",
+            //         name: "Project Alpha",
+            //         admin: "user@gmail.com",
+            //         tasks: [
+            //             {
+            //                 name: "Design mockups",
+            //                 users: ["user@gmail.com", "designer@example.com"],
+            //                 status: "completed",
+            //                 pendingDate: "2023-05-10",
+            //                 finishedDate: "2023-05-15"
+            //             },
+            //             {
+            //                 name: "Frontend implementation",
+            //                 users: ["user@gmail.com"],
+            //                 status: "active",
+            //                 pendingDate: "2023-05-16",
+            //                 finishedDate: ""
+            //             }
+            //         ],
+            //         collaborators: ["user@gmail.com", "designer@example.com", "developer@example.com"]
+            //     },
+            //     {
+            //         boardId: "board2",
+            //         name: "Marketing Campaign",
+            //         admin: "marketing@example.com",
+            //         tasks: [
+            //             {
+            //                 name: "Social media strategy",
+            //                 users: ["user@gmail.com", "marketing@example.com"],
+            //                 status: "active",
+            //                 pendingDate: "2023-05-20",
+            //                 finishedDate: ""
+            //             }
+            //         ],
+            //         collaborators: ["user@gmail.com", "marketing@example.com"]
+            //     }
+            // ];
+
+            taskBoards.forEach((taskb, index) => {
+                // Check if board should be displayed based on current filter
+
+                const board = { boardId: taskb.taskboardboard_Id, name: taskboard_name, admin: taskboard_admin, tasks: taskboard_tasks, collaborators: taskboard_collaborators }
+                if (!isBoardVisible(board)) {
+                    return;
+                }
+
+                visibleBoards++;
+
+                // Count completed tasks
+                const completedTasks = board.tasks.filter(task => task.status === 'completed').length;
+                const totalTasks = board.tasks.length;
+                const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+                // Check if current user is admin
+                const isAdmin = board.admin === "user@gmail.com";
+
+                // Create board card
+                const boardCard = document.createElement('div');
+                boardCard.className = 'bg-white rounded-lg shadow overflow-hidden';
+                boardCard.innerHTML = `
+                    <div class="p-5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                                    ${board.name}
+                                    ${isAdmin ? '<span class="ml-2 text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">Created by you</span>' : ''}
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1">${totalTasks} task${totalTasks !== 1 ? 's' : ''}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="viewBoard(${index})" class="text-indigo-600 hover:text-indigo-900" title="View">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button onclick="editBoard(${index})" class="text-blue-600 hover:text-blue-900" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="confirmDeleteBoard(${index})" class="text-red-600 hover:text-red-900" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Progress</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-indigo-600 h-2.5 rounded-full" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h4 class="text-sm font-medium text-gray-700 mb-2">Collaborators</h4>
+                            <div class="flex flex-wrap gap-1">
+                                ${board.collaborators.map(user => `
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                        ${user === "user@gmail.com" ? 'You' : user.split('@')[0]}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        ${board.tasks.length > 0 ? `
+                            <div class="mt-4">
+                                <h4 class="text-sm font-medium text-gray-700 mb-2">Recent Tasks</h4>
+                                <ul class="space-y-2">
+                                    ${board.tasks.slice(0, 3).map((task, taskIndex) => `
+                                        <li class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <span class="w-4 h-4 mr-2 flex-shrink-0">
+                                                    <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" 
+                                                        ${task.status === 'completed' ? 'checked' : ''} 
+                                                        onchange="toggleTaskStatus(${index}, ${taskIndex}, this.checked)">
+                                                </span>
+                                                <span class="text-sm ${task.status === 'completed' ? 'line-through text-gray-400' : 'text-gray-700'}">${task.name}</span>
+                                            </div>
+                                            ${task.status === 'completed' ? `
+                                                <span class="text-xs text-gray-500" title="Completed on ${new Date(task.finishedDate).toLocaleString()}">
+                                                    ${formatDate(task.finishedDate)}
+                                                </span>
+                                            ` : ''}
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                                ${board.tasks.length > 3 ? `
+                                    <button onclick="viewBoard(${index})" class="mt-2 text-sm text-indigo-600 hover:text-indigo-900">
+                                        View all ${board.tasks.length} tasks
+                                    </button>
+                                ` : ''}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+
+                container.appendChild(boardCard);
+            });
+
+            // Show/hide no results message
+            document.getElementById('noResults').classList.toggle('hidden', visibleBoards > 0);
+        }
+
+        // Format date to relative time
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) {
+                return 'Today';
+            } else if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays < 7) {
+                return `${diffDays} days ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        // Check if board should be visible based on current filter
+        function isBoardVisible(board) {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+
+            // Check search term
+            if (searchTerm && !board.name.toLowerCase().includes(searchTerm)) {
+                return false;
+            }
+
+            // Check filter
+            if (activeFilter === 'all') {
+                return true;
+            } else if (activeFilter === 'active') {
+                return board.tasks.some(task => task.status === 'active');
+            } else if (activeFilter === 'completed') {
+                return board.tasks.length > 0 && board.tasks.every(task => task.status === 'completed');
+            } else if (activeFilter === 'created') {
+                return board.admin === "user@gmail.com";
+            } else if (activeFilter === 'assigned') {
+                return board.collaborators.includes("user@gmail.com") && board.admin !== "user@gmail.com";
+            }
+
+            return true;
+        }
+
+        // Filter boards based on search input
+        function filterBoards() {
+            renderTaskBoards();
+        }
+
+        // Filter boards by status
+        function filterByStatus(status) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('bg-indigo-100');
+                btn.classList.remove('text-indigo-800');
+                btn.classList.add('bg-gray-100');
+                btn.classList.add('text-gray-800');
+            });
+
+            const activeBtn = document.querySelector(`.filter-btn[data-filter="${status}"]`);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-gray-100');
+            activeBtn.classList.remove('text-gray-800');
+            activeBtn.classList.add('bg-indigo-100');
+            activeBtn.classList.add('text-indigo-800');
+
+            // Render filtered boards
+            renderTaskBoards();
+        }
+
+        // Toggle task status
+        function toggleTaskStatus(boardIndex, taskIndex, isCompleted) {
+            const task = taskBoards[boardIndex].tasks[taskIndex];
+            task.status = isCompleted ? 'completed' : 'active';
+
+            if (isCompleted) {
+                task.finishedDate = new Date().toISOString();
+            } else {
+                task.finishedDate = '';
+            }
+
+            saveTaskBoards();
+            renderTaskBoards();
+        }
+
+        // View board details
+        function viewBoard(index) {
+            currentBoardIndex = index;
+            const board = taskBoards[index];
+
+            // Set board title
+            document.getElementById('viewBoardTitle').textContent = board.name;
+
+            // Render tasks
+            renderBoardTasks(board);
+
+            // Render collaborators
+            const collaboratorsContainer = document.getElementById('viewBoardCollaborators');
+            collaboratorsContainer.innerHTML = '';
+
+            board.collaborators.forEach(user => {
+                const isAdmin = user === board.admin;
+                const collaboratorEl = document.createElement('div');
+                collaboratorEl.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ' +
+                    (isAdmin ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800');
+                collaboratorEl.innerHTML = `
+                    ${user === "user@gmail.com" ? 'You' : user.split('@')[0]}
+                    ${isAdmin ? ' <span class="ml-1 text-xs">(Admin)</span>' : ''}
+                `;
+                collaboratorsContainer.appendChild(collaboratorEl);
+            });
+
+            // Show modal
+            document.getElementById('viewBoardModal').classList.remove('hidden');
+        }
+
+        // Render board tasks
+        function renderBoardTasks(board) {
+            const tasksContainer = document.getElementById('viewBoardTasks');
+            tasksContainer.innerHTML = '';
+
+            if (board.tasks.length === 0) {
+                tasksContainer.innerHTML = '<p class="text-gray-500">No tasks yet. Add a task to get started.</p>';
+                return;
+            }
+
+            board.tasks.forEach((task, taskIndex) => {
+                const taskEl = document.createElement('div');
+                taskEl.className = 'bg-gray-50 p-4 rounded-lg';
+                taskEl.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-start">
+                            <div class="mr-3 mt-1">
+                                <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" 
+                                    ${task.status === 'completed' ? 'checked' : ''} 
+                                    onchange="toggleTaskStatus(${currentBoardIndex}, ${taskIndex}, this.checked)">
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium ${task.status === 'completed' ? 'line-through text-gray-400' : 'text-gray-900'}">${task.name}</h4>
+                                <div class="mt-1 flex flex-wrap gap-1">
+                                    ${task.users.map(user => `
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            ${user === "user@gmail.com" ? 'You' : user.split('@')[0]}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500">
+                                    ${task.status === 'completed'
+                        ? `Completed on ${new Date(task.finishedDate).toLocaleString()}`
+                        : `Created on ${new Date(task.pendingDate).toLocaleString()}`
+                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editTask(${taskIndex})" class="text-blue-600 hover:text-blue-900" title="Edit Task">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="confirmDeleteTask(${taskIndex})" class="text-red-600 hover:text-red-900" title="Delete Task">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                tasksContainer.appendChild(taskEl);
+            });
+        }
+
+        // Close view board modal
+        function closeViewBoardModal() {
+            document.getElementById('viewBoardModal').classList.add('hidden');
+            currentBoardIndex = -1;
+        }
+
+        // Open create board modal
+        function openCreateBoardModal() {
+            document.getElementById('boardModalTitle').textContent = 'Create New Task Board';
+            document.getElementById('boardId').value = '';
+            document.getElementById('boardName').value = '';
+            document.getElementById('collaborators').value = '';
+            document.getElementById('boardModal').classList.remove('hidden');
+        }
+
+        // Open edit board modal
+        function editBoard(index) {
+            const board = taskBoards[index];
+
+            document.getElementById('boardModalTitle').textContent = 'Edit Task Board';
+            document.getElementById('boardId').value = index;
+            document.getElementById('boardName').value = board.name;
+
+            // Filter out current user from collaborators list
+            const collaborators = board.collaborators.filter(user => user !== "user@gmail.com" && user !== board.admin);
+            document.getElementById('collaborators').value = collaborators.join(', ');
+
+            document.getElementById('boardModal').classList.remove('hidden');
+        }
+
+        // Save board from modal
+        async function saveBoardModal() {
+            const boardId = document.getElementById('boardId').value;
+            const boardName = document.getElementById('boardName').value.trim();
+            const collaboratorsInput = document.getElementById('collaborators').value.trim();
+
+            if (!boardName) {
+                alert('Board name is required');
+                return;
+            }
+
+            const checkBoardNameResponse = await fetch("/CheckTaskBoardName", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: boardName })
+            });
+            const checkBoardName = await checkBoardNameResponse.json()
+            console.log("check board name ", checkBoardName)
+            if (checkBoardName) {
+                alert("Board Name already exist")
+                return
+            }
+            // Parse collaborators
+            let collaborators = collaboratorsInput ? collaboratorsInput.split(',').map(email => email.trim()) : [];
+
+            // Always include current user
+            if (!collaborators.includes("")) {
+                collaborators.push(currentUser);
+            }
+
+            if (boardId === '') {
+                // Create new board
+                const newBoard = {
+                    taskboardboard_Id: 'board' + Date.now(),
+                    taskboard_name: boardName,
+                    taskboard_admin: currentUser,
+                    taskboard_tasks: [],
+                    taskboard_collaborators: collaborators
+                };
+
+                const createTaskBoardResponse = await fetch("/createboard", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newBoard)
+                })
+                taskBoards.push(newBoard);
+            } else {
+                // Update existing board
+                const index = parseInt(boardId);
+                const board = taskBoards[index];
+
+                board.name = boardName;
+
+                // Update collaborators while preserving admin
+                board.collaborators = [...new Set([board.admin, ...collaborators])];
+            }
+
+            saveTaskBoards();
+            renderTaskBoards();
+            closeBoardModal();
+
+        }
+
+        // Close board modal
+        function closeBoardModal() {
+            document.getElementById('boardModal').classList.add('hidden');
+        }
+
+        // Open add task modal
+        function openAddTaskModal() {
+            document.getElementById('taskModalTitle').textContent = 'Add New Task';
+            document.getElementById('taskIndex').value = -1;
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskUsers').value = '';
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+
+        // Edit task
+        function editTask(taskIndex) {
+            const task = taskBoards[currentBoardIndex].tasks[taskIndex];
+
+            document.getElementById('taskModalTitle').textContent = 'Edit Task';
+            document.getElementById('taskIndex').value = taskIndex;
+            document.getElementById('taskName').value = task.name;
+
+            // Filter out current user from users list
+            const users = task.users.filter(user => user !== "user@gmail.com");
+            document.getElementById('taskUsers').value = users.join(', ');
+
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+
+        // Save task from modal
+        function saveTaskModal() {
+            const taskIndex = document.getElementById('taskIndex').value;
+            const taskName = document.getElementById('taskName').value.trim();
+            const taskUsersInput = document.getElementById('taskUsers').value.trim();
+
+            if (!taskName) {
+                alert('Task name is required');
+                return;
+            }
+
+            // Parse users
+            let users = taskUsersInput ? taskUsersInput.split(',').map(email => email.trim()) : [];
+
+            // Always include current user
+            if (!users.includes("user@gmail.com")) {
+                users.push("user@gmail.com");
+            }
+
+            if (taskIndex === '-1') {
+                // Create new task
+                const newTask = {
+                    name: taskName,
+                    users: users,
+                    status: 'active',
+                    pendingDate: new Date().toISOString(),
+                    finishedDate: ''
+                };
+
+                taskBoards[currentBoardIndex].tasks.push(newTask);
+            } else {
+                // Update existing task
+                const index = parseInt(taskIndex);
+                const task = taskBoards[currentBoardIndex].tasks[index];
+
+                task.name = taskName;
+                task.users = users;
+            }
+
+            saveTaskBoards();
+            renderBoardTasks(taskBoards[currentBoardIndex]);
+            closeTaskModal();
+        }
+
+        // Close task modal
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+        }
+
+        // Confirm delete board
+        function confirmDeleteBoard(index) {
+            document.getElementById('confirmationTitle').textContent = 'Delete Task Board';
+            document.getElementById('confirmationMessage').textContent = `Are you sure you want to delete the board "${taskBoards[index].name}"? This action cannot be undone.`;
+
+            const confirmButton = document.getElementById('confirmButton');
+            confirmButton.onclick = function () {
+                deleteBoard(index);
+                closeConfirmationModal();
+            };
+
+            document.getElementById('confirmationModal').classList.remove('hidden');
+        }
+
+        // Delete board
+        function deleteBoard(index) {
+            taskBoards.splice(index, 1);
+            saveTaskBoards();
+            renderTaskBoards();
+        }
+
+        // Confirm delete task
+        function confirmDeleteTask(taskIndex) {
+            const task = taskBoards[currentBoardIndex].tasks[taskIndex];
+
+            document.getElementById('confirmationTitle').textContent = 'Delete Task';
+            document.getElementById('confirmationMessage').textContent = `Are you sure you want to delete the task "${task.name}"? This action cannot be undone.`;
+
+            const confirmButton = document.getElementById('confirmButton');
+            confirmButton.onclick = function () {
+                deleteTask(taskIndex);
+                closeConfirmationModal();
+            };
+
+            document.getElementById('confirmationModal').classList.remove('hidden');
+        }
+
+        // Delete task
+        function deleteTask(taskIndex) {
+            taskBoards[currentBoardIndex].tasks.splice(taskIndex, 1);
+            saveTaskBoards();
+            renderBoardTasks(taskBoards[currentBoardIndex]);
+        }
+
+        // Close confirmation modal
+        function closeConfirmationModal() {
+            document.getElementById('confirmationModal').classList.add('hidden');
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+    </script>
+</body>
+
+</html>

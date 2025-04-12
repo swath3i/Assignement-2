@@ -6,17 +6,14 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-
 const firebaseConfig = {
-  apiKey: "AIzaSyA2Gj-Qh-Nv4a6FnXi988mxFxHSD8s-QM8",
-  authDomain: "tasky-6f6dd.firebaseapp.com",
-  projectId: "tasky-6f6dd",
-  storageBucket: "tasky-6f6dd.firebasestorage.app",
-  messagingSenderId: "829070764467",
-  appId: "1:829070764467:web:e320abe15a2e0f0610c3c6",
-  measurementId: "G-GS1LXQVZDS",
+  apiKey: "AIzaSyBMoMIJMqCIJZDgxEDpUShZCS2o1Ew_nxs",
+  authDomain: "assignment---1-1e153.firebaseapp.com",
+  projectId: "assignment---1-1e153",
+  storageBucket: "assignment---1-1e153.appspot.com",
+  messagingSenderId: "133737118405",
+  appId: "1:133737118405:web:244db60467492f4f10ceac",
 };
-
 window.addEventListener("load", function () {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);

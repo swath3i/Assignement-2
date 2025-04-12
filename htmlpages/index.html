@@ -303,10 +303,9 @@
 
             console.log("User detected:", userEmail);
 
-            fetch(`/createnewuser`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: userEmail })
+            fetch(`/createuser`, {
+                method: 'GET',
+
             });
         }
 
