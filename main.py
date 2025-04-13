@@ -72,7 +72,7 @@ async def fetch_login(request: Request):
 @app.post('/CheckTaskBoardName')
 def checkTaskboardName(request:Request,name:nameRequest):
     print("inside request ",name)
-    do_name_exist = firebase_db.collection('taskboards').where('name', '==', name.name).limit(1).get()
+    do_name_exist = firebase_db.collection('taskboards').where('taskboard_name', '==', name.name).limit(1).get()
     if do_name_exist:
         return True
     return False
@@ -128,6 +128,41 @@ async def get_taskboards(useremail):
     print("user tasks ",user_tasks)
     return {"user_tasks":user_tasks}
 
+@app.get("/individualtaskboard/{board_id}", response_model=Taskboard)
+def get_taskboard_details(request: Request, board_id: str):
+    current_user = get_user(request)
+    
+    if not current_user:
+        raise HTTPException(status_code=401, detail="User not authenticated")
+
+    try:
+        taskboard_snapshot = firebase_db.collection("taskboards").document(board_id).get()
+        
+        if not taskboard_snapshot.exists:
+            raise HTTPException(status_code=404, detail="Taskboard not found")
+
+        data = taskboard_snapshot.to_dict()
+
+        user_email = current_user.get("email")
+        if user_email != data.get("taskboard_admin") and user_email not in data.get("taskboard_collaborators", []):
+            raise HTTPException(status_code=403, detail="Access denied")
+
+        return Taskboard(
+            taskboardboard_Id=board_id,
+            taskboard_name=data.get("taskboard_name"),
+            taskboard_admin=data.get("taskboard_admin"),
+            taskboard_tasks=[Task(**task) for task in data.get("taskboard_tasks", [])],
+            taskboard_collaborators=data.get("taskboard_collaborators", [])
+        )
+
+    except Exception as e:
+        print(f"Error retrieving taskboard: {e}")
+        raise HTTPException(status_code=500, detail="Something went wrong while fetching taskboard data")
+
+ 
+@app.get("/taskboard/{boardID}", response_class=HTMLResponse)
+async def viewtaskboard(request: Request):
+    return templates.TemplateResponse("singletaskboard.html", {"request": request})
 
 @app.get("/createuser")
 def register_user_in_firestore(request: Request):
