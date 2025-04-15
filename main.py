@@ -53,7 +53,7 @@ async def fetch_login(request: Request):
 
 @app.get("/boards", response_class=HTMLResponse)
 async def fetch_login(request: Request):
-    return templates.TemplateResponse("board.html", {"request": request})
+    return templates.TemplateResponse("test.html", {"request": request})
 
 
 @app.get("/displaytaskboard", response_class=HTMLResponse)
@@ -62,7 +62,7 @@ async def fetch_login(request: Request):
 
 @app.get("/test", response_class=HTMLResponse)
 async def fetch_login(request: Request):
-    return templates.TemplateResponse("test.html", {"request": request})
+    return templates.TemplateResponse("test3.html", {"request": request})
 
 @app.get("/test2", response_class=HTMLResponse)
 async def fetch_login(request: Request):
@@ -128,42 +128,47 @@ async def get_taskboards(useremail):
     print("user tasks ",user_tasks)
     return {"user_tasks":user_tasks}
 
-@app.get("/individualtaskboard/{board_id}", response_model=Taskboard)
+@app.get("/individualtaskboard/{board_id}")
 def get_taskboard_details(request: Request, board_id: str):
-    current_user = get_user(request)
+    print("Searching for board_id:", board_id)
     
-    if not current_user:
-        raise HTTPException(status_code=401, detail="User not authenticated")
+    query = firebase_db.collection("taskboards").where("taskboardboard_Id", "==", board_id).stream()
+    taskboard_data = None
 
-    try:
-        taskboard_snapshot = firebase_db.collection("taskboards").document(board_id).get()
-        
-        if not taskboard_snapshot.exists:
-            raise HTTPException(status_code=404, detail="Taskboard not found")
-
-        data = taskboard_snapshot.to_dict()
-
-        user_email = current_user.get("email")
-        if user_email != data.get("taskboard_admin") and user_email not in data.get("taskboard_collaborators", []):
-            raise HTTPException(status_code=403, detail="Access denied")
-
-        return Taskboard(
-            taskboardboard_Id=board_id,
-            taskboard_name=data.get("taskboard_name"),
-            taskboard_admin=data.get("taskboard_admin"),
-            taskboard_tasks=[Task(**task) for task in data.get("taskboard_tasks", [])],
-            taskboard_collaborators=data.get("taskboard_collaborators", [])
-        )
-
-    except Exception as e:
-        print(f"Error retrieving taskboard: {e}")
-        raise HTTPException(status_code=500, detail="Something went wrong while fetching taskboard data")
+    for doc in query:
+        taskboard_data = doc.to_dict()
+        break 
+    print("taskboard_data ",taskboard_data)
+    return {"taskboard_data":taskboard_data}
 
  
 @app.get("/taskboard/{boardID}", response_class=HTMLResponse)
 async def viewtaskboard(request: Request):
     return templates.TemplateResponse("singletaskboard.html", {"request": request})
 
+
+@app.post("/updateboard/{board_id}")
+def update_taskboard(board_id: str, taskboard: Taskboard):
+    try:
+        # Query the taskboard where 'taskboardboard_Id' matches
+        query = firebase_db.collection("taskboards").where("taskboardboard_Id", "==", board_id).stream()
+
+        found = False
+        for doc in query:
+            doc_ref = firebase_db.collection("taskboards").document(doc.id)
+            doc_ref.update(taskboard.dict())
+            found = True
+
+        if not found:
+            raise HTTPException(status_code=404, detail="Taskboard not found")
+
+        return {"status": "success"}
+
+    except Exception as e:
+        print("Error updating taskboard:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+    
 @app.get("/createuser")
 def register_user_in_firestore(request: Request):
     token = request.cookies.get("token")

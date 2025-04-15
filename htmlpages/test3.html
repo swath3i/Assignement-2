@@ -737,7 +737,7 @@
         async function saveTaskboard() {
             try {
                 showLoading(true);
-
+                console.log(" boardId ", boardId)
                 const response = await fetch(`/updateboard/${boardId}`, {
                     method: 'POST',
                     headers: {

@@ -4,1067 +4,770 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster - Board Detail</title>
+    <title>Task Board Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
-<body class="bg-gray-50 min-h-screen">
-    <!-- Navbar -->
-    <nav class="bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <svg class="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                        </svg>
-                        <span class="ml-2 text-xl font-bold text-gray-900">TaskMaster</span>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div id="loading" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white p-4 rounded-lg shadow-lg">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+                <p class="text-center mt-2">Loading...</p>
+            </div>
+        </div>
+
+        <header class="mb-8">
+            <div class="flex justify-between items-center">
+                <h1 id="boardTitle" class="text-3xl font-bold text-gray-800"></h1>
+                <div class="flex space-x-2">
+                    <div id="taskCounters" class="flex space-x-4 mr-4">
+                        <div class="bg-blue-100 px-3 py-1 rounded-lg">
+                            <span class="font-semibold">Active: </span>
+                            <span id="activeTaskCount">0</span>
+                        </div>
+                        <div class="bg-green-100 px-3 py-1 rounded-lg">
+                            <span class="font-semibold">Complete: </span>
+                            <span id="completeTaskCount">0</span>
+                        </div>
+                        <div class="bg-gray-100 px-3 py-1 rounded-lg">
+                            <span class="font-semibold">Total: </span>
+                            <span id="totalTaskCount">0</span>
+                        </div>
                     </div>
-                    <div class="hidden md:ml-6 md:flex md:space-x-8">
-                        <a href="index.html"
-                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Home
-                        </a>
-                        <a href="taskboards.html"
-                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Task Boards
-                        </a>
-                        <a href="#"
-                            class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Board Detail
-                        </a>
-                        <a href="#"
-                            class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Settings
-                        </a>
-                    </div>
-                </div>
-                <div class="flex items-center">
-                    <!-- User info -->
-                    <div id="userInfo" class="flex items-center">
-                        <span id="userName" class="text-sm font-medium text-gray-700 mr-4"></span>
-                        <button type="button" onclick="logout()"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Logout
+                    <div id="ownerControls" class="hidden">
+                        <button id="renameBoard"
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-2">
+                            <i class="fas fa-edit mr-1"></i> Rename Board
+                        </button>
+                        <button id="manageUsers"
+                            class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg mr-2">
+                            <i class="fas fa-users mr-1"></i> Manage Users
+                        </button>
+                        <button id="deleteBoard" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                            <i class="fas fa-trash mr-1"></i> Delete Board
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Board Header -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div class="flex items-center">
-                    <h1 id="boardTitle" class="text-2xl font-bold text-gray-900 mr-3">Loading...</h1>
-                    <button id="editBoardNameBtn" class="hidden text-gray-500 hover:text-indigo-600"
-                        onclick="openEditBoardNameModal()">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                </div>
-                <div class="mt-4 md:mt-0 flex flex-wrap gap-2">
-                    <div id="taskCounters" class="flex space-x-4">
-                        <div class="text-sm">
-                            <span class="font-medium text-gray-500">Active:</span>
-                            <span id="activeTaskCount" class="font-bold text-indigo-600">0</span>
-                        </div>
-                        <div class="text-sm">
-                            <span class="font-medium text-gray-500">Completed:</span>
-                            <span id="completedTaskCount" class="font-bold text-green-600">0</span>
-                        </div>
-                        <div class="text-sm">
-                            <span class="font-medium text-gray-500">Total:</span>
-                            <span id="totalTaskCount" class="font-bold text-gray-700">0</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Board Creator Info -->
-            <div class="mt-4 flex items-center">
-                <span class="text-sm text-gray-500 mr-2">Created by:</span>
-                <span id="boardCreator" class="text-sm font-medium text-gray-700"></span>
-            </div>
-
-            <!-- Board Actions -->
-            <div class="mt-6 flex flex-wrap gap-3">
-                <button onclick="openAddTaskModal()"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <i class="fas fa-plus mr-2"></i> Add Task
-                </button>
-                <button id="manageMembersBtn"
-                    class="hidden inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <i class="fas fa-users mr-2"></i> Manage Members
-                </button>
-                <button id="deleteBoardBtn"
-                    class="hidden inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                    <i class="fas fa-trash mr-2"></i> Delete Board
+            <div class="mt-4">
+                <button id="addTask" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                    <i class="fas fa-plus mr-1"></i> Add Task
                 </button>
             </div>
-        </div>
+        </header>
 
-        <!-- Tasks Section -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-6">Tasks</h2>
-
-            <!-- Task Filters -->
-            <div class="mb-6 flex flex-wrap gap-2">
-                <button onclick="filterTasks('all')"
-                    class="task-filter-btn active px-3 py-1 text-sm font-medium rounded-md bg-indigo-100 text-indigo-800 hover:bg-indigo-200"
-                    data-filter="all">
-                    All
-                </button>
-                <button onclick="filterTasks('active')"
-                    class="task-filter-btn px-3 py-1 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
-                    data-filter="active">
-                    Active
-                </button>
-                <button onclick="filterTasks('completed')"
-                    class="task-filter-btn px-3 py-1 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
-                    data-filter="completed">
-                    Completed
-                </button>
-                <button onclick="filterTasks('unassigned')"
-                    class="task-filter-btn px-3 py-1 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
-                    data-filter="unassigned">
-                    Unassigned
-                </button>
-                <button onclick="filterTasks('mine')"
-                    class="task-filter-btn px-3 py-1 text-sm font-medium rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
-                    data-filter="mine">
-                    My Tasks
-                </button>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- To Do Column -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">To Do</h2>
+                <div id="todoTasks" class="space-y-3"></div>
             </div>
 
-            <!-- Tasks List -->
-            <div id="tasksContainer" class="space-y-4">
-                <!-- Tasks will be dynamically inserted here -->
-                <div class="text-center py-10 text-gray-500">
-                    <p>Loading tasks...</p>
-                </div>
+            <!-- In Progress Column -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">In Progress</h2>
+                <div id="inProgressTasks" class="space-y-3"></div>
             </div>
 
-            <!-- No Tasks Message -->
-            <div id="noTasks" class="hidden text-center py-10">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-                <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks found</h3>
-                <p class="mt-1 text-sm text-gray-500">Get started by creating a new task.</p>
-                <div class="mt-6">
-                    <button onclick="openAddTaskModal()"
-                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <i class="fas fa-plus mr-2"></i> New Task
-                    </button>
-                </div>
+            <!-- Completed Column -->
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Completed</h2>
+                <div id="completedTasks" class="space-y-3"></div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Board Name Modal -->
-    <div id="editBoardNameModal"
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                            Rename Board
-                        </h3>
-                        <div class="mt-6">
-                            <form id="editBoardNameForm" class="space-y-6">
-                                <div>
-                                    <label for="newBoardName" class="block text-sm font-medium text-gray-700">
-                                        Board Name
-                                    </label>
-                                    <div class="mt-1">
-                                        <input id="newBoardName" name="newBoardName" type="text" required
-                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onclick="saveBoardName()"
-                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                    Save
-                </button>
-                <button type="button" onclick="closeEditBoardNameModal()"
-                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-
+    <!-- Modals -->
     <!-- Add/Edit Task Modal -->
-    <div id="taskModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="taskModalTitle">
-                            Add New Task
-                        </h3>
-                        <div class="mt-6">
-                            <form id="taskForm" class="space-y-6">
-                                <input type="hidden" id="taskIndex" value="-1">
-                                <div>
-                                    <label for="taskName" class="block text-sm font-medium text-gray-700">
-                                        Task Name
-                                    </label>
-                                    <div class="mt-1">
-                                        <input id="taskName" name="taskName" type="text" required
-                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                    </div>
-                                </div>
+    <div id="taskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 id="taskModalTitle" class="text-2xl font-bold mb-4">Add Task</h2>
+            <form id="taskForm">
+                <input type="hidden" id="taskId" value="">
+                <div class="mb-4">
+                    <label for="taskName" class="block text-gray-700 font-semibold mb-2">Task Name</label>
+                    <input type="text" id="taskName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required>
+                </div>
+                <div class="mb-4">
+                    <label for="taskStatus" class="block text-gray-700 font-semibold mb-2">Status</label>
+                    <select id="taskStatus"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="todo">To Do</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="taskAssignee" class="block text-gray-700 font-semibold mb-2">Assign To</label>
+                    <select id="taskAssignee"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Unassigned</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="taskPendingDate" class="block text-gray-700 font-semibold mb-2">Due Date</label>
+                    <input type="date" id="taskPendingDate"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="closeTaskModal"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-                                <div>
-                                    <label for="taskAssignee" class="block text-sm font-medium text-gray-700">
-                                        Assigned To
-                                    </label>
-                                    <div class="mt-1">
-                                        <select id="taskAssignee" name="taskAssignee"
-                                            class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                                            <option value="">Unassigned</option>
-                                            <!-- Collaborators will be dynamically inserted here -->
-                                        </select>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+    <!-- Rename Board Modal -->
+    <div id="renameBoardModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4">Rename Board</h2>
+            <form id="renameBoardForm">
+                <div class="mb-4">
+                    <label for="newBoardName" class="block text-gray-700 font-semibold mb-2">Board Name</label>
+                    <input type="text" id="newBoardName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="closeRenameBoardModal"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancel</button>
+                    <button type="submit"
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Users Modal -->
+    <div id="manageUsersModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4">Manage Users</h2>
+            <div class="mb-4">
+                <label for="newUser" class="block text-gray-700 font-semibold mb-2">Add User</label>
+                <div class="flex space-x-2">
+                    <input type="email" id="newUser" placeholder="Enter email address"
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button type="button" id="addUserBtn"
+                        class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">Add</button>
                 </div>
             </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onclick="saveTaskModal()"
-                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                    Save
-                </button>
-                <button type="button" onclick="closeTaskModal()"
-                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Cancel
-                </button>
+            <div class="mb-4">
+                <h3 class="text-lg font-semibold mb-2">Current Users</h3>
+                <ul id="usersList" class="border border-gray-200 rounded-lg divide-y"></ul>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" id="closeManageUsersModal"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- Manage Members Modal -->
-    <div id="manageMembersModal"
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900">
-                            Manage Board Members
-                        </h3>
-                        <div class="mt-6">
-                            <div class="mb-4">
-                                <label for="newMemberEmail" class="block text-sm font-medium text-gray-700">
-                                    Add New Member
-                                </label>
-                                <div class="mt-1 flex rounded-md shadow-sm">
-                                    <input type="email" name="newMemberEmail" id="newMemberEmail"
-                                        class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-300"
-                                        placeholder="email@example.com">
-                                    <button type="button" onclick="addNewMember()"
-                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-r-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        Add
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="mt-6">
-                                <h4 class="text-sm font-medium text-gray-700 mb-3">Current Members</h4>
-                                <ul id="membersList" class="divide-y divide-gray-200">
-                                    <!-- Members will be dynamically inserted here -->
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Delete Board Confirmation Modal -->
+    <div id="deleteBoardModal"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4 text-red-600">Delete Board</h2>
+            <p class="mb-6">Are you sure you want to delete this board? This action cannot be undone.</p>
+            <div id="deleteBoardWarning" class="mb-4 p-3 bg-yellow-100 text-yellow-800 rounded-lg hidden">
+                <p>You cannot delete this board until all tasks and collaborators have been removed.</p>
             </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onclick="closeManageMembersModal()"
-                    class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm">
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Confirmation Modal -->
-    <div id="confirmationModal"
-        class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div
-                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                        <i class="fas fa-exclamation-triangle text-red-600"></i>
-                    </div>
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="confirmationTitle">
-                            Delete Confirmation
-                        </h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-500" id="confirmationMessage">
-                                Are you sure you want to delete this item? This action cannot be undone.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" id="confirmButton"
-                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                    Delete
-                </button>
-                <button type="button" onclick="closeConfirmationModal()"
-                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Cancel
-                </button>
+            <div class="flex justify-end space-x-2">
+                <button type="button" id="closeDeleteBoardModal"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">Cancel</button>
+                <button type="button" id="confirmDeleteBoard"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Delete</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Current user (simulated)
-        let currentUser = null;
+        // Global variables
+        let currentUser = '';
+        let taskboard = null;
+        let boardId = '';
 
-        // Current board data
-        let currentBoard = null;
-        let currentBoardIndex = -1;
-
-        // All task boards
-        let taskBoards = [];
-
-        // Current active task filter
-        let currentTaskFilter = 'all';
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', function () {
-            // Create a test user if not exists
-
-
-
-            if (!localStorage.getItem('user')) {
-                const testUser = {
-                    name: 'Test User',
-                    email: 'test@example.com'
-                };
-                localStorage.setItem('user', JSON.stringify(testUser));
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Get board ID from URL
+            // const urlParams = new URLSearchParams(window.location.search);
+            // boardId = urlParams.get('id');
+            const pathSegments = window.location.pathname.split('/');
+            boardId = pathSegments[pathSegments?.length - 1] || '1';
+            console.log("naord id is ", boardId)
+            if (!boardId) {
+                alert('No board ID provided');
+                return;
             }
 
-            // Get logged in user
-            currentUser = JSON.parse(localStorage.getItem('user'));
-            document.getElementById('userName').textContent = currentUser.name || currentUser.email;
-
-            // Create test boards if not exist
-            createTestData();
-
-            // Load task boards
-            loadTaskBoards();
-
-            // Get board ID from URL or use the first board
-            const urlParams = new URLSearchParams(window.location.search);
-            let boardId = urlParams.get('id');
-
-            // If no board ID in URL, use the first board
-            if (!boardId && taskBoards.length > 0) {
-                boardId = taskBoards[0].boardId;
-                // Update URL with board ID
-                const newUrl = new URL(window.location.href);
-                newUrl.searchParams.set('id', boardId);
-                window.history.pushState({}, '', newUrl);
+            // Get current user from JWT token
+            const token = getAuthTokenFromCookies(document.cookie);
+            if (!token) {
+                alert('You must be logged in to view this board');
+                window.location.href = '/login.html';
+                return;
             }
 
-            // Load the board
-            if (boardId) {
-                loadBoard(boardId);
-            } else {
-                // No boards exist, redirect to boards list
-                alert('No boards found. Creating sample boards...');
-                createTestData(true);
-                loadTaskBoards();
+            currentUser = decodeJWT(token).email || "User";
+            console.log("Current user:", currentUser);
 
-                if (taskBoards.length > 0) {
-                    const firstBoardId = taskBoards[0].boardId;
-                    const newUrl = new URL(window.location.href);
-                    newUrl.searchParams.set('id', firstBoardId);
-                    window.location.href = newUrl;
-                } else {
-                    window.location.href = 'taskboards.html';
-                }
-            }
+            // Load board data
+            await loadBoardData();
+
+            // Set up event listeners
+            setupEventListeners();
         });
 
-        // Create test data
-        function createTestData(force = false) {
-            // Only create test data if it doesn't exist or force is true
-            if (localStorage.getItem('taskBoards') && !force) {
-                return;
-            }
-
-            // Get timestamp for IDs
-            const timestamp = Date.now();
-
-            // Create test boards
-            const testBoards = [
-                {
-                    boardId: "board" + timestamp,
-                    name: "Website Redesign Project",
-                    admin: currentUser.email,
-                    tasks: [
-                        {
-                            name: "Create wireframes",
-                            users: [currentUser.email],
-                            status: "completed",
-                            pendingDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days ago
-                            finishedDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() // 10 days ago
-                        },
-                        {
-                            name: "Design homepage",
-                            users: ["designer@example.com"],
-                            status: "completed",
-                            pendingDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
-                            finishedDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days ago
-                        },
-                        {
-                            name: "Implement frontend",
-                            users: ["developer@example.com"],
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-                            finishedDate: ""
-                        },
-                        {
-                            name: "Backend integration",
-                            users: [], // Unassigned task
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-                            finishedDate: ""
-                        },
-                        {
-                            name: "User testing",
-                            users: [currentUser.email],
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-                            finishedDate: ""
-                        }
-                    ],
-                    collaborators: [currentUser.email, "designer@example.com", "developer@example.com", "projectmanager@example.com"]
-                },
-                {
-                    boardId: "board" + (timestamp + 1),
-                    name: "Marketing Campaign",
-                    admin: "marketing@example.com",
-                    tasks: [
-                        {
-                            name: "Content strategy",
-                            users: ["marketing@example.com"],
-                            status: "completed",
-                            pendingDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), // 20 days ago
-                            finishedDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString() // 15 days ago
-                        },
-                        {
-                            name: "Social media posts",
-                            users: [currentUser.email],
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(), // 12 days ago
-                            finishedDate: ""
-                        },
-                        {
-                            name: "Email newsletter",
-                            users: [], // Unassigned task
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(), // 8 days ago
-                            finishedDate: ""
-                        }
-                    ],
-                    collaborators: [currentUser.email, "marketing@example.com", "designer@example.com"]
-                },
-                {
-                    boardId: "board" + (timestamp + 2),
-                    name: "Product Launch",
-                    admin: currentUser.email,
-                    tasks: [
-                        {
-                            name: "Feature finalization",
-                            users: [currentUser.email, "productmanager@example.com"],
-                            status: "completed",
-                            pendingDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days ago
-                            finishedDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString() // 25 days ago
-                        },
-                        {
-                            name: "Documentation",
-                            users: ["writer@example.com"],
-                            status: "completed",
-                            pendingDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(), // 20 days ago
-                            finishedDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString() // 18 days ago
-                        },
-                        {
-                            name: "Marketing materials",
-                            users: ["marketing@example.com"],
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days ago
-                            finishedDate: ""
-                        },
-                        {
-                            name: "Beta testing",
-                            users: [], // Unassigned task
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
-                            finishedDate: ""
-                        },
-                        {
-                            name: "Launch event planning",
-                            users: [currentUser.email],
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-                            finishedDate: ""
-                        }
-                    ],
-                    collaborators: [currentUser.email, "productmanager@example.com", "writer@example.com", "marketing@example.com"]
-                },
-                {
-                    boardId: "board" + (timestamp + 3),
-                    name: "Backend Development",
-                    admin: "developer@example.com",
-                    tasks: [
-                        {
-                            name: "Database schema design",
-                            users: ["developer@example.com"],
-                            status: "completed",
-                            pendingDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000).toISOString(), // 25 days ago
-                            finishedDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString() // 20 days ago
-                        },
-                        {
-                            name: "API development",
-                            users: ["developer@example.com", currentUser.email],
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 18 * 24 * 60 * 60 * 1000).toISOString(), // 18 days ago
-                            finishedDate: ""
-                        },
-                        {
-                            name: "Authentication system",
-                            users: [], // Unassigned task
-                            status: "active",
-                            pendingDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
-                            finishedDate: ""
-                        }
-                    ],
-                    collaborators: [currentUser.email, "developer@example.com", "tester@example.com"]
-                }
-            ];
-
-            // Save to localStorage
-            localStorage.setItem('taskBoards', JSON.stringify(testBoards));
-        }
-
-        // Load task boards from localStorage
-        function loadTaskBoards() {
-            if (localStorage.getItem('taskBoards')) {
-                taskBoards = JSON.parse(localStorage.getItem('taskBoards'));
-            } else {
-                // Create test data if no boards exist
-                createTestData(true);
-                if (localStorage.getItem('taskBoards')) {
-                    taskBoards = JSON.parse(localStorage.getItem('taskBoards'));
-                }
+        // JWT token handling functions
+        function decodeJWT(token) {
+            try {
+                const payload = token.split('.')[1];
+                return JSON.parse(atob(payload));
+            } catch (error) {
+                console.error("Error decoding JWT:", error);
+                return {};
             }
         }
 
-        // Load board by ID
-        function loadBoard(boardId) {
-            // Find board by ID
-            currentBoardIndex = taskBoards.findIndex(board => board.boardId === boardId);
+        function getAuthTokenFromCookies(cookieString) {
+            return cookieString
+                .split(';')
+                .map(entry => entry.trim().split('='))
+                .find(([key]) => key === 'token')?.[1] || "";
+        }
 
-            if (currentBoardIndex === -1) {
-                // Board not found, redirect to boards list
-                alert('Board not found. Redirecting to boards list.');
-                window.location.href = 'taskboards.html';
-                return;
+        // Load board data from the server
+        async function loadBoardData() {
+            try {
+                showLoading(true);
+                console.log("board id ", boardId)
+                const response = await fetch(`/individualtaskboard/${boardId}`, { method: 'GET' });
+                console.log("response ", response)
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        alert('Board not found or you do not have access to this board');
+                        window.location.href = '/boards.html';
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const taskboardData = await response.json();
+                taskboard = taskboardData.taskboard_data
+                console.log("taskboard_data ", taskboard)
+                // Check if user has access to this board
+                if (taskboard.taskboard_admin !== currentUser &&
+                    !taskboard.taskboard_collaborators.includes(currentUser)) {
+                    alert('You do not have access to this board');
+                    window.location.href = '/boards.html';
+                    return;
+                }
+
+                // Update UI with board data
+                updateBoardUI();
+            } catch (error) {
+                console.error("Error loading board data:", error);
+                alert('Failed to load board data. Please try again later.');
+            } finally {
+                showLoading(false);
             }
+        }
 
-            currentBoard = taskBoards[currentBoardIndex];
+        // Update the board UI with current data
+        function updateBoardUI() {
+            // Update board title
+            document.getElementById('boardTitle').textContent = taskboard.taskboard_name;
 
-            // Check if user is a collaborator
-            if (!currentBoard.collaborators.includes(currentUser.email)) {
-                // User is not a collaborator, redirect to boards list
-                alert('You do not have access to this board. Redirecting to boards list.');
-                window.location.href = 'taskboards.html';
-                return;
-            }
+            // Show owner controls if current user is the board admin
+            const isOwner = taskboard.taskboard_admin === currentUser;
+            document.getElementById('ownerControls').classList.toggle('hidden', !isOwner);
 
-            // Render board details
-            renderBoardDetails();
+            // Update rename board modal
+            document.getElementById('newBoardName').value = taskboard.taskboard_name;
+
+            // Clear task containers
+            document.getElementById('todoTasks').innerHTML = '';
+            document.getElementById('inProgressTasks').innerHTML = '';
+            document.getElementById('completedTasks').innerHTML = '';
+
+            // Populate task assignee dropdown
+            const taskAssigneeSelect = document.getElementById('taskAssignee');
+            taskAssigneeSelect.innerHTML = '<option value="">Unassigned</option>';
+
+            // Add board admin
+            const adminOption = document.createElement('option');
+            adminOption.value = taskboard.taskboard_admin;
+            adminOption.textContent = `${taskboard.taskboard_admin} (Owner)`;
+            taskAssigneeSelect.appendChild(adminOption);
+
+            // Add collaborators
+            taskboard.taskboard_collaborators.forEach(collaborator => {
+                const option = document.createElement('option');
+                option.value = collaborator;
+                option.textContent = collaborator;
+                taskAssigneeSelect.appendChild(option);
+            });
 
             // Render tasks
-            renderTasks();
+            let activeCount = 0;
+            let completeCount = 0;
+
+            if (taskboard.taskboard_tasks && taskboard.taskboard_tasks.length > 0) {
+                taskboard.taskboard_tasks.forEach((task, index) => {
+                    // Count tasks by status
+                    if (task.task_status === 'completed') {
+                        completeCount++;
+                    } else {
+                        activeCount++;
+                    }
+
+                    // Create task element
+                    const taskElement = createTaskElement(task, index);
+
+                    // Add to appropriate column
+                    if (task.task_status === 'todo') {
+                        document.getElementById('todoTasks').appendChild(taskElement);
+                    } else if (task.task_status === 'inprogress') {
+                        document.getElementById('inProgressTasks').appendChild(taskElement);
+                    } else if (task.task_status === 'completed') {
+                        document.getElementById('completedTasks').appendChild(taskElement);
+                    }
+                });
+            }
 
             // Update task counters
-            updateTaskCounters();
-        }
-
-        // Render board details
-        function renderBoardDetails() {
-            // Set board title
-            document.getElementById('boardTitle').textContent = currentBoard.name;
-
-            // Set board creator
-            const creatorName = currentBoard.admin === currentUser.email ? 'You' : currentBoard.admin.split('@')[0];
-            document.getElementById('boardCreator').textContent = creatorName;
-
-            // Show/hide admin controls
-            const isAdmin = currentBoard.admin === currentUser.email;
-            document.getElementById('editBoardNameBtn').classList.toggle('hidden', !isAdmin);
-            document.getElementById('manageMembersBtn').classList.toggle('hidden', !isAdmin);
-            document.getElementById('deleteBoardBtn').classList.toggle('hidden', !isAdmin);
-
-            // Set up delete board button
-            if (isAdmin) {
-                document.getElementById('deleteBoardBtn').onclick = function () {
-                    confirmDeleteBoard();
-                };
-            }
-        }
-
-        // Render tasks
-        function renderTasks() {
-            const container = document.getElementById('tasksContainer');
-            container.innerHTML = '';
-
-            // Filter tasks based on current filter
-            const filteredTasks = filterTasksByCurrentFilter();
-
-            // Show/hide no tasks message
-            document.getElementById('noTasks').classList.toggle('hidden', filteredTasks.length > 0);
-
-            if (filteredTasks.length === 0) {
-                return;
-            }
-
-            // Render each task
-            filteredTasks.forEach((task, index) => {
-                const taskIndex = currentBoard.tasks.indexOf(task);
-                const isUnassigned = task.users.length === 0;
-                const isCompleted = task.status === 'completed';
-
-                const taskEl = document.createElement('div');
-                taskEl.className = `p-4 rounded-lg ${isUnassigned ? 'bg-red-50 border border-red-200' : 'bg-gray-50'}`;
-                taskEl.innerHTML = `
-                    <div class="flex items-start justify-between">
-                        <div class="flex items-start">
-                            <div class="mr-3 mt-1">
-                                <input type="checkbox" class="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500" 
-                                    ${isCompleted ? 'checked' : ''} 
-                                    onchange="toggleTaskStatus(${taskIndex}, this.checked)">
-                            </div>
-                            <div>
-                                <h4 class="text-sm font-medium ${isCompleted ? 'line-through text-gray-400' : 'text-gray-900'}">${task.name}</h4>
-                                <div class="mt-1">
-                                    ${isUnassigned ?
-                        '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Unassigned</span>' :
-                        task.users.map(user => `
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mr-1">
-                                                ${user === currentUser.email ? 'You' : user.split('@')[0]}
-                                            </span>
-                                        `).join('')
-                    }
-                                </div>
-                                <div class="mt-2 text-xs text-gray-500">
-                                    ${isCompleted
-                        ? `Completed on ${new Date(task.finishedDate).toLocaleString()}`
-                        : `Created on ${new Date(task.pendingDate).toLocaleString()}`
-                    }
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex space-x-2">
-                            <button onclick="editTask(${taskIndex})" class="text-blue-600 hover:text-blue-900" title="Edit Task">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="confirmDeleteTask(${taskIndex})" class="text-red-600 hover:text-red-900" title="Delete Task">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                container.appendChild(taskEl);
-            });
-        }
-
-        // Filter tasks based on current filter
-        function filterTasksByCurrentFilter() {
-            if (currentTaskFilter === 'all') {
-                return currentBoard.tasks;
-            } else if (currentTaskFilter === 'active') {
-                return currentBoard.tasks.filter(task => task.status === 'active');
-            } else if (currentTaskFilter === 'completed') {
-                return currentBoard.tasks.filter(task => task.status === 'completed');
-            } else if (currentTaskFilter === 'unassigned') {
-                return currentBoard.tasks.filter(task => task.users.length === 0);
-            } else if (currentTaskFilter === 'mine') {
-                return currentBoard.tasks.filter(task => task.users.includes(currentUser.email));
-            }
-
-            return currentBoard.tasks;
-        }
-
-        // Update task counters
-        function updateTaskCounters() {
-            const activeCount = currentBoard.tasks.filter(task => task.status === 'active').length;
-            const completedCount = currentBoard.tasks.filter(task => task.status === 'completed').length;
-            const totalCount = currentBoard.tasks.length;
-
             document.getElementById('activeTaskCount').textContent = activeCount;
-            document.getElementById('completedTaskCount').textContent = completedCount;
-            document.getElementById('totalTaskCount').textContent = totalCount;
+            document.getElementById('completeTaskCount').textContent = completeCount;
+            document.getElementById('totalTaskCount').textContent = taskboard.taskboard_tasks?.length || 0;
+
+            // Update users list in manage users modal
+            updateUsersList();
         }
 
-        // Filter tasks
-        function filterTasks(filter) {
-            // Update active button
-            document.querySelectorAll('.task-filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.remove('bg-indigo-100');
-                btn.classList.remove('text-indigo-800');
-                btn.classList.add('bg-gray-100');
-                btn.classList.add('text-gray-800');
-            });
+        // Create a task card element
+        function createTaskElement(task, index) {
+            const isUnassigned = !task.task_users || task.task_users.length === 0;
 
-            const activeBtn = document.querySelector(`.task-filter-btn[data-filter="${filter}"]`);
-            activeBtn.classList.add('active');
-            activeBtn.classList.remove('bg-gray-100');
-            activeBtn.classList.remove('text-gray-800');
-            activeBtn.classList.add('bg-indigo-100');
-            activeBtn.classList.add('text-indigo-800');
+            const div = document.createElement('div');
+            div.className = `p-4 border rounded-lg shadow-sm ${isUnassigned ? 'bg-red-100 border-red-300' : 'bg-white'}`;
+            div.dataset.index = index;
 
-            // Set current filter
-            currentTaskFilter = filter;
+            // Task header with name and actions
+            const header = document.createElement('div');
+            header.className = 'flex justify-between items-start mb-2';
 
-            // Render filtered tasks
-            renderTasks();
-        }
+            const taskName = document.createElement('h3');
+            taskName.className = 'font-semibold text-lg';
+            taskName.textContent = task.task_mame;
 
-        // Toggle task status
-        function toggleTaskStatus(taskIndex, isCompleted) {
-            const task = currentBoard.tasks[taskIndex];
-            task.status = isCompleted ? 'completed' : 'active';
+            const actions = document.createElement('div');
+            actions.className = 'flex space-x-1';
 
-            if (isCompleted) {
-                task.finishedDate = new Date().toISOString();
+            const editBtn = document.createElement('button');
+            editBtn.className = 'text-blue-500 hover:text-blue-700';
+            editBtn.innerHTML = '<i class="fas fa-edit"></i>';
+            editBtn.onclick = () => openEditTaskModal(index);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'text-red-500 hover:text-red-700';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            deleteBtn.onclick = () => deleteTask(index);
+
+            actions.appendChild(editBtn);
+            actions.appendChild(deleteBtn);
+
+            header.appendChild(taskName);
+            header.appendChild(actions);
+
+            // Task details
+            const details = document.createElement('div');
+            details.className = 'space-y-1 text-sm';
+
+            // Assignee
+            const assignee = document.createElement('div');
+            assignee.className = 'flex items-center';
+            assignee.innerHTML = `<i class="fas fa-user mr-2 text-gray-500"></i>`;
+
+            const assigneeText = document.createElement('span');
+            if (isUnassigned) {
+                assigneeText.className = 'text-red-600 font-semibold';
+                assigneeText.textContent = 'Unassigned';
             } else {
-                task.finishedDate = '';
+                assigneeText.textContent = task.task_users.join(', ');
             }
+            assignee.appendChild(assigneeText);
 
-            saveTaskBoards();
-            renderTasks();
-            updateTaskCounters();
-        }
+            // Due date
+            const dueDate = document.createElement('div');
+            dueDate.className = 'flex items-center';
+            dueDate.innerHTML = `<i class="fas fa-calendar mr-2 text-gray-500"></i>`;
 
-        // Open edit board name modal
-        function openEditBoardNameModal() {
-            document.getElementById('newBoardName').value = currentBoard.name;
-            document.getElementById('editBoardNameModal').classList.remove('hidden');
-        }
-
-        // Close edit board name modal
-        function closeEditBoardNameModal() {
-            document.getElementById('editBoardNameModal').classList.add('hidden');
-        }
-
-        // Save board name
-        function saveBoardName() {
-            const newName = document.getElementById('newBoardName').value.trim();
-
-            if (!newName) {
-                alert('Board name is required');
-                return;
+            const dueDateText = document.createElement('span');
+            if (task.task_pendingDate) {
+                const formattedDate = new Date(task.task_pendingDate).toLocaleDateString();
+                dueDateText.textContent = formattedDate;
+            } else {
+                dueDateText.className = 'text-gray-400';
+                dueDateText.textContent = 'No due date';
             }
+            dueDate.appendChild(dueDateText);
 
-            currentBoard.name = newName;
-            saveTaskBoards();
-            renderBoardDetails();
-            closeEditBoardNameModal();
-        }
+            // Status badge
+            const statusBadge = document.createElement('div');
+            statusBadge.className = 'inline-block px-2 py-1 rounded-full text-xs font-semibold mt-2';
 
-        // Open add task modal
-        function openAddTaskModal() {
-            document.getElementById('taskModalTitle').textContent = 'Add New Task';
-            document.getElementById('taskIndex').value = -1;
-            document.getElementById('taskName').value = '';
+            if (task.task_status === 'todo') {
+                statusBadge.className += ' bg-blue-100 text-blue-800';
+                statusBadge.textContent = 'To Do';
+            } else if (task.task_status === 'inprogress') {
+                statusBadge.className += ' bg-yellow-100 text-yellow-800';
+                statusBadge.textContent = 'In Progress';
+            } else if (task.task_status === 'completed') {
+                statusBadge.className += ' bg-green-100 text-green-800';
+                statusBadge.textContent = 'Completed';
 
-            // Populate assignee dropdown
-            populateAssigneeDropdown();
+                // Add completion date if available
+                if (task.task_finishedDate) {
+                    const completedDate = document.createElement('div');
+                    completedDate.className = 'flex items-center mt-1';
+                    completedDate.innerHTML = `<i class="fas fa-check-circle mr-2 text-green-500"></i>`;
 
-            document.getElementById('taskModal').classList.remove('hidden');
-        }
+                    const completedDateText = document.createElement('span');
+                    completedDateText.className = 'text-gray-600';
+                    completedDateText.textContent = `Completed: ${new Date(task.task_finishedDate).toLocaleDateString()}`;
+                    completedDate.appendChild(completedDateText);
 
-        // Populate assignee dropdown
-        function populateAssigneeDropdown(selectedUser = '') {
-            const dropdown = document.getElementById('taskAssignee');
-
-            // Clear existing options except the first one
-            while (dropdown.options.length > 1) {
-                dropdown.remove(1);
-            }
-
-            // Add collaborators as options
-            currentBoard.collaborators.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user;
-                option.textContent = user === currentUser.email ? 'You' : user.split('@')[0];
-                dropdown.appendChild(option);
-
-                if (user === selectedUser) {
-                    option.selected = true;
+                    details.appendChild(completedDate);
                 }
+            }
+
+            details.appendChild(assignee);
+            details.appendChild(dueDate);
+            details.appendChild(statusBadge);
+
+            div.appendChild(header);
+            div.appendChild(details);
+
+            return div;
+        }
+
+        // Update the users list in the manage users modal
+        function updateUsersList() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '';
+
+            // Add owner (cannot be removed)
+            const ownerItem = document.createElement('li');
+            ownerItem.className = 'flex justify-between items-center p-3';
+            ownerItem.innerHTML = `
+                <div>
+                    <span class="font-semibold">${taskboard.taskboard_admin}</span>
+                    <span class="ml-2 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Owner</span>
+                </div>
+            `;
+            usersList.appendChild(ownerItem);
+
+            // Add collaborators (can be removed by owner)
+            taskboard.taskboard_collaborators.forEach(collaborator => {
+                const userItem = document.createElement('li');
+                userItem.className = 'flex justify-between items-center p-3';
+
+                const userInfo = document.createElement('div');
+                userInfo.textContent = collaborator;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'text-red-500 hover:text-red-700';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.onclick = () => removeUser(collaborator);
+
+                userItem.appendChild(userInfo);
+                userItem.appendChild(removeBtn);
+
+                usersList.appendChild(userItem);
             });
         }
 
-        // Edit task
-        function editTask(taskIndex) {
-            const task = currentBoard.tasks[taskIndex];
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Add task button
+            document.getElementById('addTask').addEventListener('click', () => {
+                openAddTaskModal();
+            });
 
-            document.getElementById('taskModalTitle').textContent = 'Edit Task';
-            document.getElementById('taskIndex').value = taskIndex;
-            document.getElementById('taskName').value = task.name;
+            // Task modal
+            document.getElementById('closeTaskModal').addEventListener('click', () => {
+                document.getElementById('taskModal').classList.add('hidden');
+            });
 
-            // Populate assignee dropdown
-            populateAssigneeDropdown(task.users.length > 0 ? task.users[0] : '');
+            document.getElementById('taskForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                saveTask();
+            });
 
+            // Rename board modal
+            document.getElementById('renameBoard').addEventListener('click', () => {
+                document.getElementById('renameBoardModal').classList.remove('hidden');
+            });
+
+            document.getElementById('closeRenameBoardModal').addEventListener('click', () => {
+                document.getElementById('renameBoardModal').classList.add('hidden');
+            });
+
+            document.getElementById('renameBoardForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                renameBoard();
+            });
+
+            // Manage users modal
+            document.getElementById('manageUsers').addEventListener('click', () => {
+                document.getElementById('manageUsersModal').classList.remove('hidden');
+            });
+
+            document.getElementById('closeManageUsersModal').addEventListener('click', () => {
+                document.getElementById('manageUsersModal').classList.add('hidden');
+            });
+
+            document.getElementById('addUserBtn').addEventListener('click', () => {
+                addUser();
+            });
+
+            // Delete board modal
+            document.getElementById('deleteBoard').addEventListener('click', () => {
+                openDeleteBoardModal();
+            });
+
+            document.getElementById('closeDeleteBoardModal').addEventListener('click', () => {
+                document.getElementById('deleteBoardModal').classList.add('hidden');
+            });
+
+            document.getElementById('confirmDeleteBoard').addEventListener('click', () => {
+                deleteBoard();
+            });
+        }
+
+        // Open the add task modal
+        function openAddTaskModal() {
+            // Reset form
+            document.getElementById('taskId').value = '';
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskStatus').value = 'todo';
+            document.getElementById('taskAssignee').value = '';
+            document.getElementById('taskPendingDate').value = '';
+
+            // Update modal title
+            document.getElementById('taskModalTitle').textContent = 'Add Task';
+
+            // Show modal
             document.getElementById('taskModal').classList.remove('hidden');
         }
 
-        // Close task modal
-        function closeTaskModal() {
+        // Open the edit task modal
+        function openEditTaskModal(index) {
+            const task = taskboard.taskboard_tasks[index];
+
+            // Set form values
+            document.getElementById('taskId').value = index;
+            document.getElementById('taskName').value = task.task_mame;
+            document.getElementById('taskStatus').value = task.task_status;
+            document.getElementById('taskAssignee').value = task.task_users && task.task_users.length > 0 ? task.task_users[0] : '';
+            document.getElementById('taskPendingDate').value = task.task_pendingDate || '';
+
+            // Update modal title
+            document.getElementById('taskModalTitle').textContent = 'Edit Task';
+
+            // Show modal
+            document.getElementById('taskModal').classList.remove('hidden');
+        }
+
+        // Save task (add or edit)
+        async function saveTask() {
+            const taskId = document.getElementById('taskId').value;
+            const isNewTask = taskId === '';
+
+            const taskName = document.getElementById('taskName').value;
+            const taskStatus = document.getElementById('taskStatus').value;
+            const taskAssignee = document.getElementById('taskAssignee').value;
+            const taskPendingDate = document.getElementById('taskPendingDate').value;
+
+            // Create task object
+            const task = {
+                task_mame: taskName,
+                task_users: taskAssignee ? [taskAssignee] : [],
+                task_status: taskStatus,
+                task_pendingDate: taskPendingDate,
+                task_finishedDate: taskStatus === 'completed' ? new Date().toISOString() : ''
+            };
+
+            // Update taskboard object
+            if (isNewTask) {
+                if (!taskboard.taskboard_tasks) {
+                    taskboard.taskboard_tasks = [];
+                }
+                taskboard.taskboard_tasks.push(task);
+            } else {
+                taskboard.taskboard_tasks[taskId] = task;
+            }
+
+            // Save to server
+            await saveTaskboard();
+
+            // Close modal
             document.getElementById('taskModal').classList.add('hidden');
         }
 
-        // Save task from modal
-        function saveTaskModal() {
-            const taskIndex = parseInt(document.getElementById('taskIndex').value);
-            const taskName = document.getElementById('taskName').value.trim();
-            const assignee = document.getElementById('taskAssignee').value;
+        // Delete a task
+        async function deleteTask(index) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                taskboard.taskboard_tasks.splice(index, 1);
+                await saveTaskboard();
+            }
+        }
 
-            if (!taskName) {
-                alert('Task name is required');
+        // Rename the board
+        async function renameBoard() {
+            const newName = document.getElementById('newBoardName').value;
+            taskboard.taskboard_name = newName;
+
+            await saveTaskboard();
+
+            // Close modal
+            document.getElementById('renameBoardModal').classList.add('hidden');
+        }
+
+        // Add a user to the board
+        async function addUser() {
+            const newUserEmail = document.getElementById('newUser').value.trim();
+
+            if (!newUserEmail) {
+                alert('Please enter a valid email address');
                 return;
             }
 
-            if (taskIndex === -1) {
-                // Create new task
-                const newTask = {
-                    name: taskName,
-                    users: assignee ? [assignee] : [],
-                    status: 'active',
-                    pendingDate: new Date().toISOString(),
-                    finishedDate: ''
-                };
-
-                currentBoard.tasks.push(newTask);
-            } else {
-                // Update existing task
-                const task = currentBoard.tasks[taskIndex];
-                task.name = taskName;
-                task.users = assignee ? [assignee] : [];
-            }
-
-            saveTaskBoards();
-            renderTasks();
-            updateTaskCounters();
-            closeTaskModal();
-        }
-
-        // Confirm delete task
-        function confirmDeleteTask(taskIndex) {
-            const task = currentBoard.tasks[taskIndex];
-
-            document.getElementById('confirmationTitle').textContent = 'Delete Task';
-            document.getElementById('confirmationMessage').textContent = `Are you sure you want to delete the task "${task.name}"? This action cannot be undone.`;
-
-            const confirmButton = document.getElementById('confirmButton');
-            confirmButton.onclick = function () {
-                deleteTask(taskIndex);
-                closeConfirmationModal();
-            };
-
-            document.getElementById('confirmationModal').classList.remove('hidden');
-        }
-
-        // Delete task
-        function deleteTask(taskIndex) {
-            currentBoard.tasks.splice(taskIndex, 1);
-            saveTaskBoards();
-            renderTasks();
-            updateTaskCounters();
-        }
-
-        // Open manage members modal
-        function openManageMembersModal() {
-            renderMembersList();
-            document.getElementById('manageMembersModal').classList.remove('hidden');
-        }
-
-        // Render members list
-        function renderMembersList() {
-            const container = document.getElementById('membersList');
-            container.innerHTML = '';
-
-            currentBoard.collaborators.forEach(member => {
-                const isAdmin = member === currentBoard.admin;
-                const isSelf = member === currentUser.email;
-
-                const memberEl = document.createElement('li');
-                memberEl.className = 'py-4 flex items-center justify-between';
-                memberEl.innerHTML = `
-                    <div class="flex items-center">
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-900">${isSelf ? 'You' : member.split('@')[0]}</p>
-                            <p class="text-sm text-gray-500">${member}</p>
-                        </div>
-                    </div>
-                    <div>
-                        ${isAdmin ?
-                        '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">Admin</span>' :
-                        `<button onclick="confirmRemoveMember('${member}')" class="text-red-600 hover:text-red-900" ${isSelf ? 'disabled' : ''}>
-                                <i class="fas fa-user-minus"></i>
-                            </button>`
-                    }
-                    </div>
-                `;
-
-                container.appendChild(memberEl);
-            });
-        }
-
-        // Add new member
-        function addNewMember() {
-            const email = document.getElementById('newMemberEmail').value.trim();
-
-            if (!email) {
-                alert('Email is required');
-                return;
-            }
-
-            // Check if email is already a member
-            if (currentBoard.collaborators.includes(email)) {
+            // Check if user is already in the board
+            if (newUserEmail === taskboard.taskboard_admin ||
+                taskboard.taskboard_collaborators.includes(newUserEmail)) {
                 alert('This user is already a member of the board');
                 return;
             }
 
-            // Add member
-            currentBoard.collaborators.push(email);
-            saveTaskBoards();
-            renderMembersList();
+            // Add user to collaborators
+            taskboard.taskboard_collaborators.push(newUserEmail);
+
+            // Save to server
+            await saveTaskboard();
 
             // Clear input
-            document.getElementById('newMemberEmail').value = '';
+            document.getElementById('newUser').value = '';
         }
 
-        // Confirm remove member
-        function confirmRemoveMember(member) {
-            document.getElementById('confirmationTitle').textContent = 'Remove Member';
-            document.getElementById('confirmationMessage').textContent = `Are you sure you want to remove ${member} from the board? Their assigned tasks will be marked as unassigned.`;
+        // Remove a user from the board
+        async function removeUser(userEmail) {
+            if (confirm(`Are you sure you want to remove ${userEmail} from the board?`)) {
+                // Remove user from collaborators
+                taskboard.taskboard_collaborators = taskboard.taskboard_collaborators.filter(
+                    email => email !== userEmail
+                );
 
-            const confirmButton = document.getElementById('confirmButton');
-            confirmButton.onclick = function () {
-                removeMember(member);
-                closeConfirmationModal();
-            };
-
-            document.getElementById('confirmationModal').classList.remove('hidden');
-        }
-
-        // Remove member
-        function removeMember(member) {
-            // Remove member from collaborators
-            const memberIndex = currentBoard.collaborators.indexOf(member);
-            if (memberIndex !== -1) {
-                currentBoard.collaborators.splice(memberIndex, 1);
-            }
-
-            // Mark member's tasks as unassigned
-            currentBoard.tasks.forEach(task => {
-                if (task.users.includes(member)) {
-                    task.users = [];
+                // Mark their tasks as unassigned
+                if (taskboard.taskboard_tasks) {
+                    taskboard.taskboard_tasks.forEach(task => {
+                        if (task.task_users && task.task_users.includes(userEmail)) {
+                            // Remove user from task and mark as unassigned
+                            task.task_users = [];
+                        }
+                    });
                 }
-            });
 
-            saveTaskBoards();
-            renderMembersList();
-            renderTasks();
+                // Save to server
+                await saveTaskboard();
+            }
         }
 
-        // Close manage members modal
-        function closeManageMembersModal() {
-            document.getElementById('manageMembersModal').classList.add('hidden');
+        // Open the delete board modal
+        function openDeleteBoardModal() {
+            const canDelete = taskboard.taskboard_collaborators.length === 0 &&
+                (!taskboard.taskboard_tasks || taskboard.taskboard_tasks.length === 0);
+
+            document.getElementById('deleteBoardWarning').classList.toggle('hidden', canDelete);
+            document.getElementById('confirmDeleteBoard').disabled = !canDelete;
+
+            document.getElementById('deleteBoardModal').classList.remove('hidden');
         }
 
-        // Confirm delete board
-        function confirmDeleteBoard() {
+        // Delete the board
+        async function deleteBoard() {
             // Check if board can be deleted
-            const nonOwnerUsers = currentBoard.collaborators.filter(user => user !== currentBoard.admin);
+            const canDelete = taskboard.taskboard_collaborators.length === 0 &&
+                (!taskboard.taskboard_tasks || taskboard.taskboard_tasks.length === 0);
 
-            if (nonOwnerUsers.length > 0) {
-                alert('Cannot delete board. Remove all non-owner users first.');
+            if (!canDelete) {
+                alert('You cannot delete this board until all tasks and collaborators have been removed.');
                 return;
             }
 
-            if (currentBoard.tasks.length > 0) {
-                alert('Cannot delete board. Remove all tasks first.');
-                return;
+            try {
+                showLoading(true);
+
+                // Send delete request to server
+                const response = await fetch(`/deleteboard/${boardId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Redirect to boards list
+                window.location.href = '/boards.html';
+            } catch (error) {
+                console.error("Error deleting board:", error);
+                alert('Failed to delete board. Please try again later.');
+            } finally {
+                showLoading(false);
             }
-
-            document.getElementById('confirmationTitle').textContent = 'Delete Board';
-            document.getElementById('confirmationMessage').textContent = `Are you sure you want to delete the board "${currentBoard.name}"? This action cannot be undone.`;
-
-            const confirmButton = document.getElementById('confirmButton');
-            confirmButton.onclick = function () {
-                deleteBoard();
-                closeConfirmationModal();
-            };
-
-            document.getElementById('confirmationModal').classList.remove('hidden');
         }
 
-        // Delete board
-        function deleteBoard() {
-            taskBoards.splice(currentBoardIndex, 1);
-            saveTaskBoards();
-            window.location.href = 'taskboards.html';
+        // Save taskboard to server
+        async function saveTaskboard() {
+            try {
+                showLoading(true);
+                console.log("task baord ", taskboard)
+                const response = await fetch(`/updateboard/${boardId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(taskboard)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Reload board data
+                await loadBoardData();
+            } catch (error) {
+                console.error("Error saving taskboard:", error);
+                alert('Failed to save changes. Please try again later.');
+            } finally {
+                showLoading(false);
+            }
         }
 
-        // Close confirmation modal
-        function closeConfirmationModal() {
-            document.getElementById('confirmationModal').classList.add('hidden');
+        // Show/hide loading indicator
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('hidden', !show);
         }
-
-        // Save task boards to localStorage
-        function saveTaskBoards() {
-            localStorage.setItem('taskBoards', JSON.stringify(taskBoards));
-        }
-
-        // Logout function
-        function logout() {
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
-        }
-
-        // Event listeners
-        document.getElementById('manageMembersBtn').addEventListener('click', openManageMembersModal);
     </script>
 </body>
 
